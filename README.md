@@ -32,4 +32,7 @@ sudo apt install curl
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 pip install bcrypt
 pip install paramiko
+
+// file_download_client & file_upload_client
+pip install paramiko
 ```
