@@ -12,7 +12,7 @@ transport.connect(username=username, password=password)
 sftp = paramiko.SFTPClient.from_transport(transport)
 
 # 파일 업로드 및 다운로드
-local_file_path = "C:\\Users\\user\\Pictures\\1.png" # 업로드 하려는 파일 경로(windows)
+local_file_path = "/home/1.png" # 업로드 하려는 파일 경로(windows)
 remote_file_path = "/home/1.png" # 다운로드 하려는 파일 경로(linux)
 sftp.put(local_file_path, remote_file_path)
 
