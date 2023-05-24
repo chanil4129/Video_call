@@ -16,6 +16,7 @@ pip install --upgrade pip
 
 // remote_server
 sudo apt-get install python3.9-tk python3.9-dev
+sudo apt-get install scrot
 pip install websockets
 pip install pyautogui
 pip install Pillow
