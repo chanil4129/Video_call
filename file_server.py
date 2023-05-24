@@ -44,7 +44,7 @@ class SFTPServerUI(tk.Tk):
         self.client_sftp = paramiko.SFTPClient.from_transport(self.client_transport)
 
         # GUI 생성 - 파일 업로드 버튼 및 종료 버튼 추가
-        self.upload_button = tk.Button(self, text="Upload File", command=self.sftp_upload)
+        self.upload_button = tk.Button(self, text="Select File to Upload", command=self.sftp_upload)
         self.upload_button.pack()
         self.quit_button = tk.Button(self, text="QUIT", fg="red", command=self.on_closing)
         self.quit_button.pack()
