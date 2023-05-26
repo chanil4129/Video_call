@@ -1,9 +1,10 @@
 import paramiko
 import tkinter as tk
 from tkinter import filedialog
+import threading
 
 # SFTP 서버 정보
-hostname = "192.168.1.1"
+hostname = "192.168.0.0"
 port = 22
 username = "username"
 password = "password"
@@ -42,6 +43,13 @@ class SFTPUploadGUI(tk.Tk):
         self.transport.close()
         self.quit()
 
-if __name__ == "__main__":
+def run_gui():
     app = SFTPUploadGUI()
     app.mainloop()
+
+if __name__ == "__main__":
+    gui_thread = threading.Thread(target=run_gui)
+    gui_thread.start()
+
+    # GUI 쓰레드가 종료될 때까지 기다림
+    gui_thread.join()

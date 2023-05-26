@@ -44,7 +44,7 @@ class SFTPServerUI(tk.Tk):
         self.client_sftp = paramiko.SFTPClient.from_transport(self.client_transport)
 
         # GUI 생성 - 파일 업로드 버튼 및 종료 버튼 추가
-        self.upload_button = tk.Button(self, text="Select File to Upload", command=self.sftp_upload)
+        self.upload_button = tk.Button(self, text="Upload File", command=self.sftp_upload)
         self.upload_button.pack()
         self.quit_button = tk.Button(self, text="QUIT", fg="red", command=self.on_closing)
         self.quit_button.pack()
@@ -80,15 +80,21 @@ def start_sftp_server():
     except Exception as e:
         print(f"에러: {str(e)}")
 
-if __name__ == "__main__":
-    # 별도의 쓰레드에서 SFTP 서버를 시작
-    server_thread = threading.Thread(target=start_sftp_server)
-    server_thread.start()
-
+def run_gui():
     # 메인 쓰레드에서 GUI를 실행
     server_ui = SFTPServerUI()
     server_ui.protocol("WM_DELETE_WINDOW", server_ui.on_closing)
     server_ui.mainloop()
 
-    # GUI가 종료되면 서버 쓰레드를 종료
+if __name__ == "__main__":
+    # 별도의 쓰레드에서 SFTP 서버를 시작
+    server_thread = threading.Thread(target=start_sftp_server)
+    server_thread.start()
+
+    # GUI를 별도의 쓰레드에서 실행
+    gui_thread = threading.Thread(target=run_gui)
+    gui_thread.start()
+
+    # 두 쓰레드가 종료될 때까지 기다림
     server_thread.join()
+    gui_thread.join()
