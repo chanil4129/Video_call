@@ -14,6 +14,14 @@ import struct
 import imutils
 from multiprocessing import Process
 import tkinter.filedialog
+
+'''
+화상 및 파일 전송 프로그램(서버)
+
+이 코드는 SFTP 서버를 설정하고, 이 서버에 파일을 업로드하는 기능을 제공하는 GUI를 생성
+또한 서버에서 비디오 데이터를 송신하고 해당 데이터를 화면에 표시
+이를 위해 여러 쓰레드가 병렬로 실행
+'''
         
 class SFTPServer(paramiko.ServerInterface):
     def __init__(self):
@@ -77,7 +85,6 @@ class SFTPServerUI(tk.Tk):
         self.client_transport.close()
         self.destroy()
 
-
 def start_sftp_server():
     # RSA 키를 생성하고 SFTP 서버를 설정
     host_key = paramiko.RSAKey.generate(2048)
@@ -91,23 +98,27 @@ def start_sftp_server():
     except Exception as e:
         print(f"에러: {str(e)}")
 
-
+# 클라이언트로 비디오 프레임 데이터를 송신
 def video_send_frames(video_client_socket):
     while True:
         if video_client_socket:
+            # 'test_video.mp4' 파일에서 비디오를 읽기
             vid = cv2.VideoCapture('test_video.mp4')
+
             while(vid.isOpened()):
                 img,frame = vid.read()
                 a = pickle.dumps(frame)
                 message = struct.pack("Q",len(a))+a
+
+                # 생성한 메시지를 소켓을 통해 클라이언트에게 보내기
                 video_client_socket.sendall(message)
                 cv2.imshow("Server_Client",frame)
+
+                # q를 누르면 창 종료
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     video_client_socket.close()
                     cv2.destroyAllWindows()
                     break
-
-############################
 
 def run_gui():
     # 메인 쓰레드에서 GUI를 실행
@@ -124,8 +135,7 @@ gui_thread = threading.Thread(target=run_gui)
 gui_thread.start()
 
 
-############################
-# video
+# 비디오 전송 설정
 video_server_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 video_host_name  = socket.gethostname()
 video_host_ip = socket.gethostbyname(video_host_name)
@@ -135,10 +145,12 @@ socket_address = ('0.0.0.0',video_port)
 video_server_socket.bind(socket_address)
 video_server_socket.listen(5)
 
+# 비디오 클라이언트와 연결
 video_client_socket,video_addr = video_server_socket.accept()
+
+# 비디오 전송 쓰레드 시작
 video_send_thread = threading.Thread(target=video_send_frames, args=(video_client_socket,))
 video_send_thread.start()
-
 
 # 두 쓰레드가 종료될 때까지 기다림
 server_thread.join()
